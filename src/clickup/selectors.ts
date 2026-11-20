@@ -33,9 +33,13 @@ export const SELECTORS = {
   /** Title of the List/Folder/Space whose view is open (page header). */
   pageLocationTitle: ['[data-test="location-editable__location-title"]'],
 
-  /** List view */
-  row: [".cu-task-row__main", '[data-test="task-row-main"]'],
-  rowHover: ".cu-task-row",
+  /**
+   * List view. In ClickUp's newer list view (list-view-v3, 2026-11) the row is the name cell's
+   * flex row (status icon + name): the button is appended at its end, so names don't move.
+   */
+  row: [".cu-task-row__main", '[data-test="task-row-main"]', ".cu-task-name-cell__main"],
+  /** Row element whose hover reveals the row button (list-view-v3 rows are `.vgt-row`). */
+  rowHover: ":is(.cu-task-row, .vgt-row)",
   rowLink: [".cu-task-row-main__link", 'a[href*="/t/"]'],
   rowTitle: [".cu-task-row-main__link-text-inner", ".cu-task-row-main__link-text"],
   /** Where the row button is inserted before (falls back to appending to the row). */
