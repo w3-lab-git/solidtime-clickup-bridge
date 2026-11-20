@@ -9,6 +9,8 @@ export interface State {
   configured: boolean;
   /** All ClickUp ids of the task whose Solidtime entry is running (empty when none / not from ClickUp). */
   activeTaskIds: string[];
+  /** Start of the running entry (ISO), for the elapsed time on the button; null when none. */
+  activeStart?: string | null;
 }
 
 /** Background → content scripts (tabs.sendMessage). */

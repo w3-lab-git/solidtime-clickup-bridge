@@ -8,7 +8,7 @@ Entries are named the way Clockify's ClickUp integration named them:
 Title of an awesome task | #86c1abcde
 ```
 
-- **Task view** (modal, side panel or full page): the button sits in the task header.
+- **Task view** (modal, side panel or full page): the button sits in the task header. While the task is tracked it shows the running time, e.g. **Stop timer | 0:12:34**.
 - **List view**: a play button shows on each row when you hover over it.
 - **One click switches tasks.** If another timer is running (including one started in the Solidtime desktop app or web UI), it is stopped and the new one starts. Clicking the task that is already being tracked stops it.
 - **Projects are picked automatically:** if a Solidtime project's name appears in the ClickUp List name (or the Space name), that project is used. Manual List/Space mappings and a default project are available when names don't line up (see [Projects](#projects)).

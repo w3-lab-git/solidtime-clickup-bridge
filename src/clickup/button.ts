@@ -33,6 +33,8 @@ const STYLE = `
   button[data-state="running"]:hover { background: #b91c1c; }
   button[data-state="busy"] { opacity: .6; cursor: progress; }
   svg { width: 14px; height: 14px; fill: currentColor; flex-shrink: 0; }
+  .elapsed { font-variant-numeric: tabular-nums; padding-left: 6px; border-left: 1px solid rgb(255 255 255 / .4); }
+  .elapsed:empty { display: none; }
 `;
 
 /** Creates an isolated (Shadow DOM) timer button so ClickUp's CSS can't affect it. */
@@ -72,8 +74,19 @@ export function renderButtonState(host: HTMLElement, state: ButtonState): void {
     const text = doc.createElement("span");
     text.textContent = label;
     content.push(text);
+    if (running) {
+      const elapsed = doc.createElement("span");
+      elapsed.className = "elapsed";
+      content.push(elapsed);
+    }
   }
   button.replaceChildren(...content);
+}
+
+/** Running time shown next to "Stop timer" on the task view button (rows only have an icon). */
+export function setElapsed(host: HTMLElement, text: string): void {
+  const elapsed = host.shadowRoot?.querySelector<HTMLElement>(".elapsed");
+  if (elapsed && elapsed.textContent !== text) elapsed.textContent = text;
 }
 
 /**
