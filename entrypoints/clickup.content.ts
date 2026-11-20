@@ -20,11 +20,25 @@ export default defineContentScript({
   main(ctx) {
     const bridge = createBridge(document, toggle);
 
-    const send = <T>(request: Request) => browser.runtime.sendMessage(request) as Promise<T>;
+    /**
+     * After the extension is reloaded or updated, this copy in an already-open tab is cut off
+     * from the background. ctx.isInvalid notices that, runs onInvalidated (removes the buttons)
+     * and stops the polling, instead of throwing "Extension context invalidated" every 10 s.
+     */
+    async function send<T>(request: Request): Promise<T | undefined> {
+      if (ctx.isInvalid) return undefined;
+      try {
+        return (await browser.runtime.sendMessage(request)) as T;
+      } catch (error) {
+        if (ctx.isInvalid) return undefined;
+        throw error;
+      }
+    }
 
     async function toggle(task: ClickUpTask) {
       const response = await send<ToggleResponse>({ type: "toggle", task });
-      if (!response.ok) showToast(document, response.error);
+      if (!response) showToast(document, "Solidtime for ClickUp was updated. Refresh this page to use it.");
+      else if (!response.ok) showToast(document, response.error);
       else if (response.warning) showToast(document, response.warning);
     }
 
@@ -36,7 +50,8 @@ export default defineContentScript({
     /** maxAgeMs keeps background polling cheap; user-driven refreshes pass a small value. */
     async function refresh(maxAgeMs?: number) {
       if (document.visibilityState !== "visible") return;
-      apply(await send<State>({ type: "getState", maxAgeMs }));
+      const state = await send<State>({ type: "getState", maxAgeMs });
+      if (state) apply(state);
     }
 
     // State pushes from our background (e.g. a timer started in another tab).
