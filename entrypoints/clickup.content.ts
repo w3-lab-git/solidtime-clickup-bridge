@@ -37,7 +37,7 @@ export default defineContentScript({
 
     async function toggle(task: ClickUpTask) {
       const response = await send<ToggleResponse>({ type: "toggle", task });
-      if (!response) showToast(document, "Solidtime for ClickUp was updated. Refresh this page to use it.");
+      if (!response) showToast(document, "W3 Lab Solidtime for ClickUp was updated. Refresh this page to use it.");
       else if (!response.ok) showToast(document, response.error);
       else if (response.warning) showToast(document, response.warning);
     }
