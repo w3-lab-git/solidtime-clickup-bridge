@@ -1,4 +1,5 @@
 import { sharesTaskId } from "../core/taskId";
+import { formatElapsed } from "../core/text";
 import { taskIds, type ClickUpTask } from "../core/timerToggle";
 import {
   createButtonHost,
@@ -6,6 +7,7 @@ import {
   HOST_ATTR,
   renderButtonState,
   setButtonContext,
+  setElapsed,
   type ButtonVariant,
 } from "./button";
 import { findDetailAnchor, findRows, readDetailTask, readRowTask } from "./read";
@@ -14,8 +16,8 @@ import { queryFirst, SELECTORS } from "./selectors";
 export interface Bridge {
   /** Adds/updates/removes buttons to match the current page. Idempotent. */
   sync(): void;
-  /** All ClickUp ids of the task whose timer is running (empty when none). */
-  setActiveTaskIds(ids: readonly string[]): void;
+  /** All ClickUp ids of the task whose timer is running (empty when none), and when it started (ISO). */
+  setActiveTaskIds(ids: readonly string[], startedAt?: string | null): void;
   disconnect(): void;
 }
 
@@ -45,6 +47,23 @@ export function createBridge(doc: Document, onToggle: ToggleHandler, options: Br
   let activeTaskIds: readonly string[] = [];
   let busyTask: ClickUpTask | null = null;
   let scheduled: ReturnType<typeof setTimeout> | null = null;
+  let startedAt: number | null = null;
+  let ticker: ReturnType<typeof setInterval> | null = null;
+
+  function tick() {
+    const text = startedAt === null ? "" : formatElapsed(Date.now() - startedAt);
+    for (const host of doc.querySelectorAll<HTMLElement>(`[${HOST_ATTR}="detail"][data-state="running"]`)) {
+      setElapsed(host, text);
+    }
+  }
+
+  function setTicking(on: boolean) {
+    if (on && !ticker) ticker = setInterval(tick, 1000);
+    if (!on && ticker) {
+      clearInterval(ticker);
+      ticker = null;
+    }
+  }
 
   function stateFor(task: ClickUpTask) {
     if (busyTask && sharesTaskId(taskIds(task), taskIds(busyTask))) return "busy" as const;
@@ -134,6 +153,7 @@ export function createBridge(doc: Document, onToggle: ToggleHandler, options: Br
     ensureStyle();
     syncDetail();
     syncRows();
+    tick();
   }
 
   // ClickUp is a SPA that re-renders constantly; batch mutations into one sync.
@@ -144,13 +164,17 @@ export function createBridge(doc: Document, onToggle: ToggleHandler, options: Br
 
   return {
     sync,
-    setActiveTaskIds(ids) {
+    setActiveTaskIds(ids, start = null) {
       activeTaskIds = ids;
+      const parsed = start ? Date.parse(start) : NaN;
+      startedAt = ids.length > 0 && Number.isFinite(parsed) ? parsed : null;
+      setTicking(startedAt !== null);
       sync();
     },
     disconnect() {
       observer.disconnect();
       if (scheduled) clearTimeout(scheduled);
+      setTicking(false);
     },
   };
 }

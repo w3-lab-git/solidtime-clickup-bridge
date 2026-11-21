@@ -30,7 +30,8 @@ export default defineContentScript({
 
     function apply(state: State | undefined) {
       const ids = state?.configured && Array.isArray(state.activeTaskIds) ? state.activeTaskIds : [];
-      bridge.setActiveTaskIds(uniqueTaskIds(ids));
+      const start = state?.configured && typeof state.activeStart === "string" ? state.activeStart : null;
+      bridge.setActiveTaskIds(uniqueTaskIds(ids), start);
     }
 
     /** maxAgeMs keeps background polling cheap; user-driven refreshes pass a small value. */

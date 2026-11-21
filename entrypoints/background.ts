@@ -43,7 +43,7 @@ export default defineBackground(() => {
       const active = await (await clientFor(settings)).getActiveTimeEntry();
       lastFetch = Date.now();
       const activeTaskIds = active ? entryTaskIds(active, await trackedTask.lookup()) : [];
-      return hub.publish({ configured: true, activeTaskIds });
+      return hub.publish({ configured: true, activeTaskIds, activeStart: active?.start ?? null });
     } catch {
       // Keep showing the last known state; the next refresh or click will retry.
       return current;
@@ -73,7 +73,11 @@ export default defineBackground(() => {
 
       lastFetch = Date.now();
       if (result.active) await trackedTask.remember(result.active, taskIds(task));
-      await hub.publish({ configured: true, activeTaskIds: result.active ? taskIds(task) : [] });
+      await hub.publish({
+        configured: true,
+        activeTaskIds: result.active ? taskIds(task) : [],
+        activeStart: result.active?.start ?? null,
+      });
       void refreshSolidtimeTabs(settings.baseUrl);
 
       const warning = result.active ? noProjectWarning(result.project, task, settings, loaded) : undefined;
