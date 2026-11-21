@@ -18,6 +18,7 @@ export interface Bridge {
   sync(): void;
   /** All ClickUp ids of the task whose timer is running (empty when none), and when it started (ISO). */
   setActiveTaskIds(ids: readonly string[], startedAt?: string | null): void;
+  /** Stops watching the page and removes every button (the extension was reloaded or updated). */
   disconnect(): void;
 }
 
@@ -175,6 +176,8 @@ export function createBridge(doc: Document, onToggle: ToggleHandler, options: Br
       observer.disconnect();
       if (scheduled) clearTimeout(scheduled);
       setTicking(false);
+      for (const host of doc.querySelectorAll(`[${HOST_ATTR}]`)) host.remove();
+      doc.getElementById(ROW_STYLE_ID)?.remove();
     },
   };
 }
