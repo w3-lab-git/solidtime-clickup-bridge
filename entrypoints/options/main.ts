@@ -11,6 +11,7 @@ import {
   saveSettings,
   type Settings,
 } from "../../src/settings";
+import { W3_LAB_SOLIDTIME_URL } from "../../src/w3lab";
 
 const byId = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
 
@@ -146,7 +147,11 @@ byId("connect").addEventListener("click", async () => {
   if (!token) return setStatus(connectStatus, "Paste an API token.", "err");
 
   // Must run directly in the click handler: browsers only show the prompt for user gestures.
-  const granted = await browser.permissions.request({ origins: [originPattern(baseUrl)] });
+  // It throws for an origin the manifest doesn't list (W3 Lab build: only our instance).
+  const granted = await browser.permissions.request({ origins: [originPattern(baseUrl)] }).catch(() => null);
+  if (granted === null) {
+    return setStatus(connectStatus, `This extension only connects to ${W3_LAB_SOLIDTIME_URL}.`, "err");
+  }
   if (!granted) return setStatus(connectStatus, "Access to your Solidtime instance is required.", "err");
 
   setStatus(connectStatus, "Connecting…");
@@ -209,7 +214,7 @@ byId("disconnect").addEventListener("click", async () => {
 
 async function init() {
   settings = await loadSettings();
-  baseUrlInput.value = settings.baseUrl;
+  baseUrlInput.value = settings.baseUrl || W3_LAB_SOLIDTIME_URL;
   tokenInput.value = settings.token;
   if (!settings.baseUrl || !settings.token) return;
   // Never send the stored token to a URL that fails today's rules (same check as the background).

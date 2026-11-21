@@ -4,6 +4,7 @@
  */
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
+import { W3_LAB_HOST_PERMISSIONS } from "../src/w3lab";
 
 const ROOT = join(import.meta.dirname, "..");
 const failures: string[] = [];
@@ -22,8 +23,8 @@ for (const target of ["chrome-mv3", "firefox-mv3"]) {
     `no host_permissions allowed, got ${JSON.stringify(manifest.host_permissions)}`,
   );
   expect(
-    JSON.stringify(manifest.optional_host_permissions) === '["https://*/*","http://*/*"]',
-    "optional_host_permissions changed",
+    JSON.stringify(manifest.optional_host_permissions) === JSON.stringify(W3_LAB_HOST_PERMISSIONS),
+    `optional_host_permissions must be ${JSON.stringify(W3_LAB_HOST_PERMISSIONS)} (W3 Lab build)`,
   );
   const matches = (manifest.content_scripts ?? []).flatMap((cs: { matches: string[] }) => cs.matches);
   expect(
