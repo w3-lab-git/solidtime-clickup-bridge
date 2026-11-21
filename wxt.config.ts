@@ -11,7 +11,7 @@ export default defineConfig({
   manifest: {
     name: W3_LAB_EXTENSION_NAME,
     description:
-      "W3 Lab's build of Solidtime for ClickUp: start Solidtime timers from ClickUp tasks with one click. Not affiliated with Solidtime or ClickUp.",
+      "W3 Lab build: start Solidtime timers from ClickUp tasks with one click. Not affiliated with Solidtime or ClickUp.",
     homepage_url: "https://github.com/w3-lab-git/solidtime-clickup-bridge",
     // scripting: after start/stop, nudge open tabs of the user's own Solidtime instance to refresh
     // (only possible on the origin the user granted; see refreshSolidtimeTabs in background.ts).

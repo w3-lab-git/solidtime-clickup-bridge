@@ -15,6 +15,10 @@ for (const target of ["chrome-mv3", "firefox-mv3"]) {
 
   expect(manifest.manifest_version === 3, "must be Manifest V3");
   expect(
+    manifest.description.length <= 132,
+    `description must be at most 132 characters (Chrome Web Store), got ${manifest.description.length}`,
+  );
+  expect(
     JSON.stringify(manifest.permissions) === '["storage","scripting"]',
     `permissions must be ["storage","scripting"], got ${JSON.stringify(manifest.permissions)}`,
   );
