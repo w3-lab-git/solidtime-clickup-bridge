@@ -9,7 +9,7 @@ Title of an awesome task | #86c1abcde
 ```
 
 - **Task view** (modal, side panel or full page): the button sits in the task header.
-- **List view**: a play button shows on each row when you hover over it.
+- **List view** (including ClickUp's newer table-style List view): a play button shows on each row when you hover over it.
 - **One click switches tasks.** If another timer is running (including one started in the Solidtime desktop app or web UI), it is stopped and the new one starts. Clicking the task that is already being tracked stops it.
 - **Projects are picked automatically:** if a Solidtime project's name appears in the ClickUp List name (or the Folder or Space name), that project is used. Manual List/Folder/Space mappings and a default project are available when names don't line up (see [Projects](#projects)).
 - Custom task IDs (e.g. `#DEV-42`) are used when your workspace has them enabled.
